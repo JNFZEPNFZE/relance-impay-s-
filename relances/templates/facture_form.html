@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block titre %}{{ 'Modifier' if facture_id else 'Nouvelle' }} facture{% endblock %}
+{% block contenu %}
+<h1>{{ 'Modifier la facture' if facture_id else 'Nouvelle facture' }}</h1>
+{% if not clients %}
+<p class="flash info">Créez d'abord un client : <a href="{{ url_for('client_nouveau') }}">nouveau client</a>.</p>
+{% else %}
+<form method="post" class="formulaire">
+  <div class="ligne">
+    <label>Numéro *<input name="numero" value="{{ facture.numero or '' }}" required></label>
+    <label>Client *
+      <select name="client_id" required>
+        <option value="">—</option>
+        {% for c in clients %}<option value="{{ c.id }}" {{ 'selected' if facture.client_id == c.id }}>{{ c.nom }}</option>{% endfor %}
+      </select></label>
+  </div>
+  <div class="ligne">
+    <label>Date d'émission *<input type="date" name="date_emission" value="{{ facture.date_emission or '' }}" required></label>
+    <label>Date d'échéance *<input type="date" name="date_echeance" value="{{ facture.date_echeance or '' }}" required></label>
+  </div>
+  <div class="ligne">
+    <label>Montant TTC (€) *<input name="montant_ttc" inputmode="decimal" value="{{ facture.montant_ttc if facture.montant_ttc is not none else '' }}" required></label>
+    <label>Déjà réglé (€)<input name="montant_paye" inputmode="decimal" value="{{ facture.montant_paye if facture.montant_paye is not none else 0 }}"></label>
+  </div>
+  <label class="case"><input type="checkbox" name="litige" value="1" {{ 'checked' if facture.litige }}> Facture en litige (exclue des relances automatiques)</label>
+  <label>Notes<textarea name="notes" rows="2">{{ facture.notes or '' }}</textarea></label>
+  <p class="actions"><button class="btn principal">Enregistrer</button>
+    <a class="btn" href="{{ url_for('factures') }}">Annuler</a></p>
+</form>
+{% if facture_id %}
+<form method="post" action="{{ url_for('facture_supprimer', facture_id=facture_id) }}"
+      onsubmit="return confirm('Supprimer définitivement cette facture ?');">
+  <button class="btn danger petit">Supprimer la facture</button></form>
+{% endif %}
+{% endif %}
+{% endblock %}

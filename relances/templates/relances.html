@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% from "_niveau.html" import badge with context %}
+{% block titre %}Historique des relances{% endblock %}
+{% block contenu %}
+<h1>Historique des courriers</h1>
+{% if relances %}
+<table class="liste">
+  <thead><tr><th>Date</th><th>Client</th><th>Niveau</th><th>Factures</th><th>Mode d'envoi</th><th>Référence</th><th class="num">Montant</th><th></th></tr></thead>
+  <tbody>
+  {% for r in relances %}
+    <tr><td>{{ r.date_envoi|date_fr }}</td>
+      <td><a href="{{ url_for('client_fiche', client_id=r.client_id) }}">{{ r.client_nom }}</a></td>
+      <td>{{ badge(r.niveau) }}</td><td>{{ r.numeros or '' }}</td><td>{{ r.mode_envoi }}</td><td>{{ r.reference }}</td>
+      <td class="num">{{ r.montant_du|euro }}</td>
+      <td><a class="btn petit" href="{{ url_for('relance_voir', relance_id=r.id) }}">Voir / imprimer</a></td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}<p class="vide">Aucun courrier envoyé pour l'instant.</p>{% endif %}
+{% endblock %}

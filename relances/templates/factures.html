@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block titre %}Factures{% endblock %}
+{% block contenu %}
+<h1>Factures</h1>
+<p class="actions">
+  <a class="btn principal" href="{{ url_for('facture_nouvelle') }}">Nouvelle facture</a>
+  <a class="btn" href="{{ url_for('factures_import') }}">Importer un CSV</a>
+  <a class="btn" href="{{ url_for('factures_export') }}">Exporter les impayés (CSV)</a>
+</p>
+<nav class="onglets">
+  {% for cle, lib in [('impayees', 'Impayées'), ('retard', 'En retard'), ('payees', 'Payées'), ('toutes', 'Toutes')] %}
+    <a href="{{ url_for('factures', filtre=cle) }}" class="{{ 'actif' if filtre == cle }}">{{ lib }}</a>
+  {% endfor %}
+</nav>
+{% set lignes = factures %}{% set avec_client = true %}
+{% include "_table_factures.html" %}
+{% endblock %}

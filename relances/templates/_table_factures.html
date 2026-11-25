@@ -1,0 +1,36 @@
+{% from "_niveau.html" import badge with context %}
+{% if lignes %}
+<div class="defile"><table class="liste">
+  <thead><tr>{% if avec_client %}<th>Client</th>{% endif %}<th>N°</th><th>Émise le</th><th>Échéance</th><th class="num">TTC</th>
+    <th class="num">Réglé</th><th class="num">Reste dû</th><th>Statut</th><th>Relance</th><th>Actions</th></tr></thead>
+  <tbody>
+  {% for item in lignes %}
+    {% set f = item[1] if avec_client else item %}
+    <tr class="{{ 'payee' if f.payee }}">
+      {% if avec_client %}<td><a href="{{ url_for('client_fiche', client_id=item[0].client_id) }}">{{ item[0].client_nom }}</a></td>{% endif %}
+      <td class="nowrap">{{ f.numero }}</td>
+      <td class="nowrap">{{ f.date_emission|date_fr }}</td>
+      <td class="nowrap">{{ f.date_echeance|date_fr }}</td>
+      <td class="num">{{ f.montant_ttc|euro }}</td>
+      <td class="num">{{ f.montant_paye|euro }}</td>
+      <td class="num">{{ f.reste_du|euro }}</td>
+      <td>{% if f.payee %}<span class="badge ok">Payée</span>
+          {% elif f.litige %}<span class="badge litige">Litige</span>
+          {% elif f.jours_retard %}<span class="badge retard">{{ f.jours_retard }} j de retard</span>
+          {% else %}<span class="badge n0">À échoir</span>{% endif %}</td>
+      <td>{% if f.niveau_atteint %}{{ badge(f.niveau_atteint) }}{% endif %}</td>
+      <td class="actions-ligne">
+        <a class="btn petit" href="{{ url_for('facture_modifier', facture_id=f.id) }}">Modifier</a>
+        {% if not f.payee %}
+        <form method="post" action="{{ url_for('facture_paiement', facture_id=f.id) }}" class="inline paiement">
+          <input name="montant" placeholder="Montant" size="5" aria-label="Montant reçu">
+          <button class="btn petit">+ Payé</button>
+          <button class="btn petit" name="solde" value="1">Soldée</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% else %}<p class="vide">Aucune facture.</p>{% endif %}

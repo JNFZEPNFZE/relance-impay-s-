@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "_niveau.html" import badge with context %}
+{% block titre %}Tableau de bord{% endblock %}
+{% block contenu %}
+<h1>Tableau de bord <small>au {{ aujourd_hui|date_fr }}</small></h1>
+
+<section class="stats">
+  <div class="stat"><span class="val">{{ stats.encours_echu|euro }}</span><span>encours échu impayé</span></div>
+  <div class="stat"><span class="val">{{ stats.nb_factures }}</span><span>facture(s) en retard</span></div>
+  <div class="stat"><span class="val">{{ stats.nb_clients }}</span><span>client(s) concerné(s)</span></div>
+  <div class="stat accent"><span class="val">{{ stats.a_relancer }}</span><span>relance(s) à envoyer</span></div>
+  <div class="stat alerte"><span class="val">{{ stats.contentieux }}</span><span>dossier(s) à passer au contentieux</span></div>
+</section>
+
+{% if stats.a_relancer %}
+<form method="post" action="{{ url_for('relances_lot') }}" class="actions"
+      onsubmit="return confirm('Générer et enregistrer les {{ stats.a_relancer }} relance(s) suggérée(s) ?');">
+  <button class="btn principal">Générer les {{ stats.a_relancer }} relance(s) du jour</button>
+  <span class="aide">Chaque client reçoit un courrier au niveau suggéré, regroupant toutes ses factures échues.</span>
+</form>
+{% endif %}
+
+{% if lignes %}
+<table class="liste">
+  <thead><tr><th>Client</th><th>Factures</th><th class="num">Reste dû</th><th class="num">Retard max</th>
+    <th>Dernière relance</th><th>Prochaine étape</th><th></th></tr></thead>
+  <tbody>
+  {% for c, s in lignes %}
+    <tr class="{{ 'a-faire' if s.a_relancer }}">
+      <td><a href="{{ url_for('client_fiche', client_id=c.id) }}">{{ c.nom }}</a>
+        {% if c.type == 'particulier' %}<span class="tag">particulier</span>{% endif %}</td>
+      <td>{{ s.factures|length }}</td>
+      <td class="num">{{ s.total_du|euro }}</td>
+      <td class="num">{{ s.retard_max }} j</td>
+      <td>{{ badge(s.niveau_actuel) }}{% if s.date_derniere_relance %} <small>le {{ s.date_derniere_relance|date_fr }}</small>{% endif %}</td>
+      <td>
+        {% if s.a_relancer %}<strong>{{ s.prochaine_action }}</strong> <small>dès maintenant</small>
+        {% else %}{{ s.prochaine_action }} <small>le {{ s.date_prochaine_action|date_fr }}</small>{% endif %}
+      </td>
+      <td>{% if s.niveau_suggere != NIVEAU_CONTENTIEUX %}<a class="btn petit" href="{{ url_for('relance_preparer', client_id=c.id) }}">Préparer un courrier</a>{% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="vide">Aucune facture échue impayée. 🎉<br>
+  <a href="{{ url_for('facture_nouvelle') }}">Saisir une facture</a> ou <a href="{{ url_for('factures_import') }}">importer un fichier CSV</a>.</p>
+{% endif %}
+{% endblock %}

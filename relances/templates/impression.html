@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Impression des courriers</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="impression">
+  <div class="barre-impression">
+    <a class="btn" href="{{ retour }}">← Retour</a>
+    <button class="btn principal" onclick="window.print()">Imprimer / enregistrer en PDF</button>
+    <span>{{ relances|length }} courrier(s)</span>
+    {% if relances|length == 1 %}
+    <form method="post" action="{{ url_for('relance_supprimer', relance_id=relances[0].id) }}" class="inline"
+          onsubmit="return confirm('Supprimer ce courrier de l\'historique ?');">
+      <button class="btn danger petit">Annuler ce courrier</button></form>
+    {% endif %}
+  </div>
+  {% for r in relances %}
+    <div class="page">{{ r.contenu_html|safe }}</div>
+  {% endfor %}
+</body>
+</html>

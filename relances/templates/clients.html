@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titre %}Clients{% endblock %}
+{% block contenu %}
+<h1>Clients</h1>
+<p class="actions"><a class="btn principal" href="{{ url_for('client_nouveau') }}">Nouveau client</a></p>
+{% if clients %}
+<table class="liste">
+  <thead><tr><th>Nom</th><th>Type</th><th>Ville</th><th>Contact</th><th class="num">Factures</th><th class="num">Encours</th></tr></thead>
+  <tbody>
+  {% for c in clients %}
+    <tr>
+      <td><a href="{{ url_for('client_fiche', client_id=c.id) }}">{{ c.nom }}</a></td>
+      <td>{{ c.type }}</td>
+      <td>{{ c.code_postal }} {{ c.ville }}</td>
+      <td>{{ c.contact }}{% if c.email %} · {{ c.email }}{% endif %}</td>
+      <td class="num">{{ c.nb_factures }}</td>
+      <td class="num">{{ c.encours|euro }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}<p class="vide">Aucun client pour l'instant.</p>{% endif %}
+{% endblock %}

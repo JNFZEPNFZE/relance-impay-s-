@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titre %}Relances impayés{% endblock %} · Relances impayés</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="barre">
+  <a class="logo" href="{{ url_for('tableau_de_bord') }}">Relances impayés</a>
+  <nav>
+    {% set ep = request.endpoint or '' %}
+    <a href="{{ url_for('tableau_de_bord') }}" class="{{ 'actif' if ep == 'tableau_de_bord' }}">Tableau de bord</a>
+    <a href="{{ url_for('clients') }}" class="{{ 'actif' if ep.startswith('client') }}">Clients</a>
+    <a href="{{ url_for('factures') }}" class="{{ 'actif' if ep.startswith('facture') }}">Factures</a>
+    <a href="{{ url_for('relances') }}" class="{{ 'actif' if ep.startswith('relance') }}">Historique</a>
+    <a href="{{ url_for('modeles') }}" class="{{ 'actif' if ep == 'modeles' }}">Modèles</a>
+    <a href="{{ url_for('parametres') }}" class="{{ 'actif' if ep == 'parametres' }}">Paramètres</a>
+  </nav>
+</header>
+<main>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+  {% endwith %}
+  {% block contenu %}{% endblock %}
+</main>
+</body>
+</html>

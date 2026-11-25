@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "_niveau.html" import badge with context %}
+{% block titre %}{{ client.nom }}{% endblock %}
+{% block contenu %}
+<h1>{{ client.nom }} <span class="tag">{{ client.type }}</span></h1>
+<div class="colonnes">
+  <div class="carte">
+    <h2>Coordonnées</h2>
+    <p>{% if client.contact %}{{ client.contact }}<br>{% endif %}
+      {{ client.adresse|replace('\n', ', ') }}<br>{{ client.code_postal }} {{ client.ville }}</p>
+    <p>{% if client.email %}✉ {{ client.email }}<br>{% endif %}{% if client.telephone %}☎ {{ client.telephone }}{% endif %}</p>
+    {% if client.notes %}<p class="notes">{{ client.notes }}</p>{% endif %}
+    <p class="actions">
+      <a class="btn petit" href="{{ url_for('client_modifier', client_id=client.id) }}">Modifier</a>
+      <form method="post" action="{{ url_for('client_supprimer', client_id=client.id) }}" class="inline"
+            onsubmit="return confirm('Supprimer ce client, ses factures et son historique de relances ?');">
+        <button class="btn petit danger">Supprimer</button></form>
+    </p>
+  </div>
+  <div class="carte">
+    <h2>Situation</h2>
+    {% if sit.factures %}
+      <p><strong>{{ sit.total_du|euro }}</strong> échus impayés sur {{ sit.factures|length }} facture(s), retard max {{ sit.retard_max }} jours.</p>
+      <p>Niveau atteint : {{ badge(sit.niveau_actuel) }}{% if sit.date_derniere_relance %} le {{ sit.date_derniere_relance|date_fr }}{% endif %}</p>
+      <p>Prochaine étape : <strong>{{ sit.prochaine_action }}</strong>
+        {% if sit.a_relancer %}— à faire maintenant{% else %}— le {{ sit.date_prochaine_action|date_fr }}{% endif %}</p>
+    {% else %}<p>Aucune facture échue impayée.</p>{% endif %}
+    <p class="actions"><a class="btn principal" href="{{ url_for('relance_preparer', client_id=client.id) }}">Préparer un courrier de relance</a></p>
+  </div>
+</div>
+
+<h2>Factures <a class="btn petit" href="{{ url_for('facture_nouvelle', client_id=client.id) }}">+ Ajouter</a></h2>
+{% include "_table_factures.html" %}
+
+<h2>Courriers envoyés</h2>
+{% if relances %}
+<table class="liste">
+  <thead><tr><th>Date</th><th>Niveau</th><th>Mode d'envoi</th><th>Référence</th><th class="num">Montant réclamé</th><th></th></tr></thead>
+  <tbody>
+  {% for r in relances %}
+    <tr><td>{{ r.date_envoi|date_fr }}</td><td>{{ badge(r.niveau) }}</td><td>{{ r.mode_envoi }}</td>
+      <td>{{ r.reference }}</td><td class="num">{{ r.montant_du|euro }}</td>
+      <td><a class="btn petit" href="{{ url_for('relance_voir', relance_id=r.id) }}">Voir / imprimer</a></td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}<p class="vide">Aucun courrier envoyé.</p>{% endif %}
+{% endblock %}

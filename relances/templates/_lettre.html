@@ -1,0 +1,26 @@
+<div class="lettre">
+  <div class="expediteur">
+    <strong>{{ params.societe_nom }}</strong><br>
+    {{ params.societe_adresse|replace('\n', ', ') }}<br>
+    {{ params.societe_code_postal }} {{ params.societe_ville }}
+    {% if params.societe_telephone %}<br>Tél. : {{ params.societe_telephone }}{% endif %}
+    {% if params.societe_email %}<br>{{ params.societe_email }}{% endif %}
+  </div>
+  <div class="destinataire">
+    <strong>{{ client.nom }}</strong><br>
+    {% if client.contact %}{{ client.contact }}<br>{% endif %}
+    {% for l in (client.adresse or '').splitlines() %}{{ l }}<br>{% endfor %}
+    {{ client.code_postal }} {{ client.ville }}
+  </div>
+  <p class="lieu-date">{{ params.societe_ville }}, le {{ date_courrier|date_longue }}</p>
+  {% if mode.startswith('Lettre recommandée') %}
+  <p class="mention-envoi">Lettre recommandée avec accusé de réception{% if reference %} n° {{ reference }}{% endif %}</p>
+  {% elif reference %}<p class="mention-envoi">Réf. : {{ reference }}</p>{% endif %}
+  <p class="objet"><strong>Objet : {{ objet }}</strong></p>
+  <div class="corps">{{ corps }}</div>
+  <p class="signature">{{ params.signataire|replace('\n', '<br>'|safe) }}</p>
+  <div class="pied">
+    {{ params.societe_nom }}{% if params.societe_siret %} – SIRET {{ params.societe_siret }}{% endif %}
+    {% if params.societe_iban %}<br>Règlement par virement : IBAN {{ params.societe_iban }}{% endif %}
+  </div>
+</div>

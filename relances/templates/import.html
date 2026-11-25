@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block titre %}Import CSV{% endblock %}
+{% block contenu %}
+<h1>Importer des factures (CSV)</h1>
+{% if resultat %}
+<div class="carte">
+  <p><strong>{{ resultat.importees }}</strong> facture(s) importée(s), {{ resultat.clients_crees }} client(s) créé(s),
+    {{ resultat.ignorees }} facture(s) ignorée(s) car déjà présente(s).</p>
+  {% if resultat.erreurs %}<ul class="erreurs">{% for e in resultat.erreurs %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+  <p><a class="btn principal" href="{{ url_for('tableau_de_bord') }}">Voir le tableau de bord</a></p>
+</div>
+{% endif %}
+<form method="post" enctype="multipart/form-data" class="formulaire">
+  <label>Fichier CSV (export de votre logiciel de facturation ou d'Excel)
+    <input type="file" name="fichier" accept=".csv,text/csv" required></label>
+  <p class="actions"><button class="btn principal">Importer</button></p>
+</form>
+<div class="carte aide">
+  <h2>Format attendu</h2>
+  <p>Séparateur <code>;</code> ou <code>,</code>, première ligne = en-têtes. Colonnes obligatoires :
+    <code>numero</code>, <code>client</code>, <code>date_echeance</code>, <code>montant_ttc</code>.
+    Facultatives : <code>date_emission</code>, <code>montant_paye</code>.</p>
+  <p>Dates au format <code>JJ/MM/AAAA</code> ou <code>AAAA-MM-JJ</code>, montants avec virgule ou point.
+    Les clients inconnus sont créés automatiquement (pensez à compléter leur adresse).
+    Une facture dont le numéro existe déjà est ignorée.</p>
+<pre>numero;client;date_emission;date_echeance;montant_ttc;montant_paye
+F2026-001;Boulangerie Martin;01/09/2026;01/10/2026;1 250,00;0
+F2026-002;Garage Durand;15/09/2026;15/10/2026;480,50;100</pre>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block titre %}Modèles de courrier{% endblock %}
+{% block contenu %}
+<h1>Modèles de courrier</h1>
+<div class="colonnes modeles">
+<form method="post" class="formulaire large">
+  {% for m in modeles %}
+  <fieldset>
+    <legend>{{ m.niveau }}. {{ m.libelle }}
+      <a class="petit-lien" href="{{ url_for('modeles', reinitialiser=m.niveau) }}"
+         onclick="return confirm('Restaurer le texte d\'origine de ce modèle ?');">réinitialiser</a></legend>
+    <label>Objet<input name="objet_{{ m.niveau }}" value="{{ m.objet }}"></label>
+    <label>Texte du courrier<textarea name="corps_{{ m.niveau }}" rows="16">{{ m.corps }}</textarea></label>
+  </fieldset>
+  {% endfor %}
+  <p class="actions"><button class="btn principal">Enregistrer les modèles</button></p>
+</form>
+<aside class="carte aide">
+  <h2>Variables disponibles</h2>
+  <p>Écrivez-les entre accolades ; elles sont remplacées à la génération. Laissez une ligne vide entre deux paragraphes.</p>
+  <dl>{% for nom, desc in variables.items() %}<dt><code>{{ '{' ~ nom ~ '}' }}</code></dt><dd>{{ desc }}</dd>{% endfor %}</dl>
+  <p>Les courriers déjà enregistrés ne sont pas modifiés : l'historique conserve le texte exact envoyé.</p>
+</aside>
+</div>
+{% endblock %}

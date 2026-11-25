@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% from "_niveau.html" import badge with context %}
+{% block titre %}Relance – {{ client.nom }}<script>
+  // Mise en demeure → recommandé AR proposé par défaut
+  document.querySelector('select[name=niveau]').addEventListener('change', function () {
+    var mode = document.querySelector('select[name=mode]');
+    mode.value = this.value === '3' ? 'Lettre recommandée avec AR' : 'Courrier simple';
+  });
+</script>
+{% endblock %}
+{% block contenu %}
+<h1>Courrier de relance – <a href="{{ url_for('client_fiche', client_id=client.id) }}">{{ client.nom }}</a></h1>
+<p>Niveau déjà atteint : {{ badge(sit.niveau_actuel) }}
+  {% if sit.a_relancer %} · suggestion : <strong>{{ sit.prochaine_action }}</strong>{% endif %}</p>
+{% if sit.niveau_suggere == NIVEAU_CONTENTIEUX %}
+<p class="flash info">La mise en demeure est restée sans effet : il est conseillé de passer à une procédure
+  d'injonction de payer (tribunal judiciaire ou de commerce) ou de confier le dossier à un commissaire de justice.</p>
+{% endif %}
+{% if not client.adresse %}<p class="flash erreur">L'adresse de ce client est vide :
+  <a href="{{ url_for('client_modifier', client_id=client.id) }}">compléter la fiche</a>.</p>{% endif %}
+
+<form method="get" class="formulaire large" id="form-relance">
+  <fieldset>
+    <legend>Factures concernées</legend>
+    {% for f in impayees %}
+      <label class="case"><input type="checkbox" name="factures" value="{{ f.id }}" {{ 'checked' if f.id in ids }}>
+        {{ f.numero }} – reste dû {{ f.reste_du|euro }} – échéance {{ f.date_echeance|date_fr }}
+        {% if f.jours_retard %}({{ f.jours_retard }} j de retard){% else %}(non échue){% endif %}
+        {% if f.litige %}<span class="badge litige">Litige</span>{% endif %}
+        {% if f.niveau_atteint %}{{ badge(f.niveau_atteint) }}{% endif %}</label>
+    {% endfor %}
+  </fieldset>
+  <div class="ligne">
+    <label>Type de courrier
+      <select name="niveau">{% for n, lib in NIVEAUX.items() %}<option value="{{ n }}" {{ 'selected' if n == niveau }}>{{ n }}. {{ lib }}</option>{% endfor %}</select></label>
+    <label>Date du courrier<input type="date" name="date" value="{{ date_courrier.isoformat() }}"></label>
+    <label>Mode d'envoi
+      <select name="mode">{% for m in modes %}<option {{ 'selected' if m == mode }}>{{ m }}</option>{% endfor %}</select></label>
+    <label>N° de recommandé / référence<input name="reference" value="{{ reference }}"></label>
+  </div>
+  <p class="actions">
+    <button class="btn">Actualiser l'aperçu</button>
+    <button class="btn principal" formmethod="post"
+      {{ 'disabled' if not apercu }}>Enregistrer et imprimer</button>
+  </p>
+</form>
+
+{% if apercu %}
+<h2>Aperçu</h2>
+<div class="apercu"><div class="page">{{ apercu|safe }}</div></div>
+{% else %}<p class="vide">Sélectionnez au moins une facture pour voir l'aperçu.</p>{% endif %}
+<script>
+  // Mise en demeure → recommandé AR proposé par défaut
+  document.querySelector('select[name=niveau]').addEventListener('change', function () {
+    var mode = document.querySelector('select[name=mode]');
+    mode.value = this.value === '3' ? 'Lettre recommandée avec AR' : 'Courrier simple';
+  });
+</script>
+{% endblock %}

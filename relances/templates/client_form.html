@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block titre %}{{ 'Modifier' if client.id else 'Nouveau' }} client{% endblock %}
+{% block contenu %}
+<h1>{{ 'Modifier le client' if client.id else 'Nouveau client' }}</h1>
+<form method="post" class="formulaire">
+  <label>Nom / raison sociale *<input name="nom" value="{{ client.nom or '' }}" required></label>
+  <label>Type
+    <select name="type">
+      <option value="professionnel" {{ 'selected' if client.type != 'particulier' }}>Professionnel (pénalités + indemnité 40 €)</option>
+      <option value="particulier" {{ 'selected' if client.type == 'particulier' }}>Particulier (intérêts au taux légal)</option>
+    </select></label>
+  <label>Interlocuteur<input name="contact" value="{{ client.contact or '' }}" placeholder="M. Dupont, service comptabilité"></label>
+  <label>Adresse<textarea name="adresse" rows="2">{{ client.adresse or '' }}</textarea></label>
+  <div class="ligne">
+    <label>Code postal<input name="code_postal" value="{{ client.code_postal or '' }}"></label>
+    <label>Ville<input name="ville" value="{{ client.ville or '' }}"></label>
+  </div>
+  <div class="ligne">
+    <label>E-mail<input type="email" name="email" value="{{ client.email or '' }}"></label>
+    <label>Téléphone<input name="telephone" value="{{ client.telephone or '' }}"></label>
+  </div>
+  <label>Notes internes<textarea name="notes" rows="3">{{ client.notes or '' }}</textarea></label>
+  <p class="actions"><button class="btn principal">Enregistrer</button>
+    <a class="btn" href="{{ url_for('client_fiche', client_id=client.id) if client.id else url_for('clients') }}">Annuler</a></p>
+</form>
+{% endblock %}

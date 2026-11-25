@@ -1,0 +1,5 @@
+{% macro badge(niveau) -%}
+{%- if niveau == 0 %}<span class="badge n0">Aucune relance</span>
+{%- elif niveau >= NIVEAU_CONTENTIEUX %}<span class="badge n4">Contentieux</span>
+{%- else %}<span class="badge n{{ niveau }}">{{ NIVEAUX[niveau] }}</span>{% endif -%}
+{%- endmacro %}

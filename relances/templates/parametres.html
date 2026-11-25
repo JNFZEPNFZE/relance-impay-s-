@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block titre %}Paramètres{% endblock %}
+{% block contenu %}
+<h1>Paramètres</h1>
+<form method="post" class="formulaire">
+  <fieldset><legend>Votre société (en-tête des courriers)</legend>
+    <label>Raison sociale<input name="societe_nom" value="{{ p.societe_nom }}"></label>
+    <label>Adresse<textarea name="societe_adresse" rows="2">{{ p.societe_adresse }}</textarea></label>
+    <div class="ligne">
+      <label>Code postal<input name="societe_code_postal" value="{{ p.societe_code_postal }}"></label>
+      <label>Ville<input name="societe_ville" value="{{ p.societe_ville }}"></label>
+    </div>
+    <div class="ligne">
+      <label>Téléphone<input name="societe_telephone" value="{{ p.societe_telephone }}"></label>
+      <label>E-mail<input name="societe_email" value="{{ p.societe_email }}"></label>
+    </div>
+    <div class="ligne">
+      <label>SIRET<input name="societe_siret" value="{{ p.societe_siret }}"></label>
+      <label>IBAN (pour le règlement)<input name="societe_iban" value="{{ p.societe_iban }}"></label>
+    </div>
+    <label>Signature<textarea name="signataire" rows="2">{{ p.signataire }}</textarea></label>
+  </fieldset>
+  <fieldset><legend>Calendrier des relances</legend>
+    <div class="ligne">
+      <label>1re relance : jours après l'échéance<input type="number" min="0" name="delai_niveau_1" value="{{ p.delai_niveau_1 }}"></label>
+      <label>2e relance : jours après la 1re<input type="number" min="0" name="delai_niveau_2" value="{{ p.delai_niveau_2 }}"></label>
+      <label>Mise en demeure : jours après la 2e<input type="number" min="0" name="delai_niveau_3" value="{{ p.delai_niveau_3 }}"></label>
+    </div>
+    <label>Délai de paiement accordé dans le courrier (jours) — sert aussi au passage au contentieux après la mise en demeure
+      <input type="number" min="0" name="delai_paiement_courrier" value="{{ p.delai_paiement_courrier }}"></label>
+  </fieldset>
+  <fieldset><legend>Pénalités de retard</legend>
+    <div class="ligne">
+      <label>Taux annuel des pénalités – professionnels (%)<input name="taux_penalites_pro" value="{{ p.taux_penalites_pro }}"></label>
+      <label>Taux d'intérêt légal – particuliers (%)<input name="taux_interet_particulier" value="{{ p.taux_interet_particulier }}"></label>
+      <label>Indemnité forfaitaire par facture (€)<input name="indemnite_forfaitaire" value="{{ p.indemnite_forfaitaire }}"></label>
+    </div>
+    <p class="aide">Entre professionnels, le taux des pénalités est celui prévu dans vos CGV ; à défaut, le taux BCE majoré de 10 points.
+      Il ne peut être inférieur à 3 fois le taux d'intérêt légal. L'indemnité forfaitaire de 40 € (art. L441-10 et D441-5 du Code de commerce)
+      ne s'applique qu'aux professionnels. Pensez à mettre à jour les taux chaque semestre.</p>
+  </fieldset>
+  <p class="actions"><button class="btn principal">Enregistrer</button></p>
+</form>
+{% endblock %}
